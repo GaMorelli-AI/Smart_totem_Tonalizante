@@ -1,0 +1,17 @@
+{
+  "name": "smart-totem-tonalizantes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bio Extratus — Smart Totem — Simulador de Tonalizantes (Módulo 02)",
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "start": "node dev-server.mjs"
+  },
+  "dependencies": {
+    "replicate": "^1.4.0"
+  },
+  "devDependencies": {
+    "vercel": "^59.0.0"
+  }
+}

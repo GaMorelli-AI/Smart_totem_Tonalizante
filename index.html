@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Bio Extratus — Tonalizantes | Smart Totem</title>
+  <meta name="description" content="Experimente uma nova cor Bio Extratus e veja a simulação no seu próprio cabelo." />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- 01: ATTRACT SCREEN / HOME -->
+    <section class="tela tela-home ativa" data-tela="home" id="tela-home">
+      <div class="home-conteudo">
+        <img class="home-logo" src="assets/logo/bio-extratus-logo.webp" alt="Bio Extratus — Cosméticos Naturais" />
+
+        <div class="home-modulo">
+          <span class="home-modulo-tag">Tonalizantes</span>
+          <h1>Experimente uma<br />nova cor</h1>
+          <p>Veja como você ficaria com uma nova tonalidade.</p>
+        </div>
+
+        <button class="btn-iniciar" type="button" data-action="start" aria-label="Toque para começar"></button>
+        <p class="home-cta-label">Toque para começar</p>
+      </div>
+      <div class="home-swatches" aria-hidden="true">
+        <span style="--cor:#171012"></span>
+        <span style="--cor:#3b2a20"></span>
+        <span style="--cor:#6b4a30"></span>
+        <span style="--cor:#a9764a"></span>
+        <span style="--cor:#caa46a"></span>
+        <span style="--cor:#8a2b3c"></span>
+      </div>
+    </section>
+
+    <!-- 02: ESCOLHA DA TONALIDADE -->
+    <section class="tela" data-tela="cores" id="tela-cores">
+      <header class="cabecalho-app">
+        <span class="badge"><span class="dot"></span>Bio Extratus</span>
+      </header>
+      <div class="conteudo conteudo-cores">
+        <div class="conteudo-central">
+          <div class="cabecalho">
+            <div class="categoria"><span class="check">✓</span> EXPERIMENTE UMA NOVA COR</div>
+            <h1>Qual cor você quer<br />experimentar?</h1>
+            <p class="instrucao">Escolha uma tonalidade.</p>
+          </div>
+
+          <div class="categorias-chips" id="categorias-chips"></div>
+          <div class="opcoes-cores" id="grade-cores"></div>
+        </div>
+      </div>
+      <nav class="navegacao navegacao-dupla">
+        <button class="btn-nav btn-nav-secundario" type="button" data-action="voltar-home" aria-label="Voltar">‹</button>
+        <button class="btn-cta" type="button" id="btn-confirmar-cor" data-action="confirmar-cor" disabled>
+          Quero testar essa cor
+        </button>
+      </nav>
+    </section>
+
+    <!-- 03: PREPARAÇÃO DA FOTO -->
+    <section class="tela" data-tela="preparo" id="tela-preparo">
+      <header class="cabecalho-app">
+        <span class="badge"><span class="dot"></span>Bio Extratus</span>
+      </header>
+      <div class="conteudo">
+        <div class="conteudo-central conteudo-central--estreito">
+          <div class="cabecalho">
+            <div class="categoria"><span class="check">✓</span> EXPERIMENTE UMA NOVA COR</div>
+            <h1>Agora queremos<br />ver você</h1>
+            <p class="instrucao">Vamos tirar uma foto para simular sua nova cor.</p>
+          </div>
+
+          <div class="preparo-cor-mini">
+            <img id="preparo-cor-imagem" src="" alt="" />
+            <div>
+              <span class="preparo-cor-label">Cor escolhida</span>
+              <strong><span id="preparo-cor-codigo"></span> · <span id="preparo-cor-nome"></span></strong>
+            </div>
+          </div>
+
+          <ul class="lista-orientacoes">
+            <li>Olhe para a câmera</li>
+            <li>Deixe todo o cabelo visível</li>
+            <li>Fique preferencialmente de frente</li>
+            <li>Evite cobrir o cabelo</li>
+          </ul>
+
+          <button class="btn-cta btn-cta-bloco" type="button" data-action="abrir-camera">Abrir câmera</button>
+
+          <p class="texto-privacidade">
+            Sua foto será utilizada apenas para criar esta simulação e não será armazenada pela aplicação.
+          </p>
+        </div>
+      </div>
+      <nav class="navegacao">
+        <button class="btn-nav btn-nav-secundario" type="button" data-action="voltar-cores" aria-label="Voltar">‹</button>
+      </nav>
+    </section>
+
+    <!-- 04: CÂMERA -->
+    <section class="tela tela-camera" data-tela="camera" id="tela-camera">
+      <div class="camera-wrap">
+        <video id="video-camera" playsinline autoplay muted></video>
+        <div class="camera-guia" aria-hidden="true"></div>
+
+        <button class="btn-camera-fechar" type="button" data-action="fechar-camera" aria-label="Voltar">‹</button>
+
+        <div class="camera-erro" id="camera-erro" hidden>
+          <div class="camera-erro-conteudo">
+            <p id="camera-erro-mensagem"></p>
+            <button class="btn-cta" type="button" data-action="retry-camera">Tentar novamente</button>
+            <button class="btn-texto" type="button" data-action="fechar-camera">Voltar</button>
+          </div>
+        </div>
+
+        <div class="camera-controles">
+          <button class="btn-capturar" type="button" id="btn-capturar" data-action="capturar" aria-label="Tirar foto" disabled>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05: CONFIRMAÇÃO -->
+    <section class="tela" data-tela="confirmacao" id="tela-confirmacao">
+      <div class="conteudo conteudo-confirmacao">
+        <div class="conteudo-central conteudo-central--estreito">
+          <div class="cabecalho">
+            <h1>Gostou da foto?</h1>
+          </div>
+          <div class="foto-confirmacao-wrap">
+            <img id="foto-confirmacao" src="" alt="Foto capturada" />
+          </div>
+          <div class="acoes-confirmacao">
+            <button class="btn-secundario" type="button" data-action="tirar-outra">Tirar outra</button>
+            <button class="btn-cta" type="button" data-action="usar-foto">Usar essa foto</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06: PROCESSAMENTO -->
+    <section class="tela" data-tela="processando" id="tela-processando">
+      <div class="processando-conteudo">
+        <div class="processando-anim" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <p id="mensagem-processando">Preparando seu novo visual...</p>
+      </div>
+    </section>
+
+    <!-- 07: RESULTADO -->
+    <section class="tela" data-tela="resultado" id="tela-resultado">
+      <header class="cabecalho-app">
+        <span class="badge"><span class="dot"></span>Bio Extratus</span>
+      </header>
+      <div class="conteudo conteudo-resultado">
+        <div class="conteudo-central">
+          <div class="cabecalho">
+            <div class="categoria"><span class="check">✓</span> SEU NOVO VISUAL</div>
+            <h1>Olha você de<br />cor nova!</h1>
+          </div>
+
+          <div class="comparador" id="comparador">
+            <img class="comparador-imagem comparador-depois" id="img-depois" src="" alt="Resultado com a nova cor" />
+            <div class="comparador-antes-wrap" id="comparador-antes-wrap" style="clip-path:inset(0 50% 0 0)">
+              <img class="comparador-imagem comparador-antes" id="img-antes" src="" alt="Foto original" />
+            </div>
+            <div
+              class="comparador-linha"
+              id="comparador-linha"
+              style="left:50%"
+              role="slider"
+              tabindex="0"
+              aria-label="Comparar antes e depois"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="50"
+            >
+              <span class="comparador-alca">↔</span>
+            </div>
+            <span class="comparador-tag comparador-tag-antes">ANTES</span>
+            <span class="comparador-tag comparador-tag-depois">DEPOIS</span>
+          </div>
+
+          <div class="produto-selecionado">
+            <span class="produto-selecionado-label">Você experimentou</span>
+            <div class="produto-selecionado-card">
+              <img id="produto-selecionado-imagem" src="" alt="" />
+              <strong><span id="produto-selecionado-codigo"></span> · <span id="produto-selecionado-nome"></span></strong>
+            </div>
+          </div>
+
+          <p class="disclaimer">
+            Resultado gerado digitalmente para fins de simulação. O resultado real da tonalização pode variar de
+            acordo com a cor base, histórico químico e características do cabelo.
+          </p>
+
+          <div class="acoes-resultado">
+            <button class="btn-secundario" type="button" data-action="testar-outra-cor">Testar outra cor</button>
+            <button class="btn-cta" type="button" data-action="finalizar">Finalizar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07b: ERRO DE GERAÇÃO -->
+    <section class="tela" data-tela="erro" id="tela-erro">
+      <div class="conteudo conteudo-erro">
+        <div class="conteudo-central conteudo-central--estreito erro-conteudo">
+          <h1>Ops!</h1>
+          <p id="erro-mensagem">Não conseguimos criar sua simulação desta vez.</p>
+          <div class="acoes-confirmacao">
+            <button class="btn-secundario" type="button" data-action="voltar-cores-erro">Voltar</button>
+            <button class="btn-cta" type="button" data-action="tentar-novamente">Tentar novamente</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08: OBRIGADO -->
+    <section class="tela" data-tela="obrigado" id="tela-obrigado">
+      <div class="obrigado-conteudo">
+        <p>Obrigado por experimentar 💚</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Modal: aviso de inatividade -->
+  <div class="modal-inatividade" id="modal-inatividade" hidden>
+    <div class="modal-inatividade-conteudo">
+      <p>Sua sessão será encerrada por inatividade.</p>
+      <div class="modal-contador" id="modal-contador">5</div>
+      <button class="btn-cta" type="button" id="btn-continuar-sessao" data-action="continuar-sessao">
+        Continuar experiência
+      </button>
+    </div>
+  </div>
+
+  <p class="smart-totem-rodape">Smart Totem</p>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

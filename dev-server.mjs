@@ -124,6 +124,9 @@ function serveStatic(req, res) {
       return;
     }
     res.setHeader('Content-Type', MIME_TYPES[path.extname(filePath)] || 'application/octet-stream');
+    // Em desenvolvimento, nunca deixar o navegador cachear HTML/CSS/JS — um
+    // reload precisa sempre refletir o arquivo atual em disco.
+    res.setHeader('Cache-Control', 'no-store, must-revalidate');
     res.end(data);
   });
 }

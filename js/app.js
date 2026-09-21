@@ -13,6 +13,10 @@ import {
   startSessionWatchers,
 } from './session.js';
 
+// Em dev, anexamos o código técnico do erro na mensagem da câmera (só para
+// depuração local — nunca em produção, onde o totem deve ficar "limpo").
+const isDev = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
 // ---------------------------------------------------------------------------
 // Referências de DOM
 // ---------------------------------------------------------------------------
@@ -52,6 +56,7 @@ const modalContador = document.getElementById('modal-contador');
 
 let categoriaAtual = 'todos';
 let cameraRequestId = 0;
+let cameraEntrando = false;
 let mensagemProcessandoTimer = null;
 
 const MENSAGENS_PROCESSANDO = [
@@ -84,12 +89,18 @@ const SCREEN_ENTER_HANDLERS = {
 
 function goToScreen(nome) {
   const anterior = session.currentScreen;
+  // Ignora navegações redundantes (ex.: duplo toque/duplo evento de clique
+  // no mesmo botão) — sem isto, uma tela como a câmera pode ser "entrada"
+  // duas vezes em paralelo e gerar condições de corrida.
+  if (nome === anterior) return;
+
   if (SCREEN_EXIT_HANDLERS[anterior]) SCREEN_EXIT_HANDLERS[anterior]();
 
   telas.forEach((el) => {
     el.classList.toggle('ativa', el.dataset.tela === nome);
   });
   setScreen(nome);
+  window.scrollTo(0, 0);
 
   if (SCREEN_ENTER_HANDLERS[nome]) SCREEN_ENTER_HANDLERS[nome]();
 }
@@ -167,6 +178,13 @@ function renderizarPreparo() {
 // ---------------------------------------------------------------------------
 
 async function entrarNaCamera() {
+  // Guarda de reentrância: se já existe uma tentativa em andamento (ex.:
+  // duplo clique/duplo evento de toque disparando "retry-camera" ou a
+  // entrada na tela duas vezes), ignora a nova chamada em vez de abrir uma
+  // segunda captura de câmera concorrente.
+  if (cameraEntrando) return;
+  cameraEntrando = true;
+
   const requestId = ++cameraRequestId;
   esconderErroCamera();
   btnCapturar.disabled = true;
@@ -183,9 +201,27 @@ async function entrarNaCamera() {
     trackEvent('camera_opened');
   } catch (err) {
     if (requestId !== cameraRequestId) return;
-    const message = err instanceof CameraError ? err.message : 'Não foi possível abrir a câmera agora.';
+    // Defesa extra: se, por qualquer motivo, já existe uma stream ativa
+    // conectada ao vídeo (ex.: uma tentativa concorrente que teve sucesso),
+    // não mostra erro nenhum — a câmera já está funcionando.
+    if (video.srcObject && video.srcObject.active) return;
+    console.error('[camera] falha ao abrir a câmera:', err);
+    let message = err instanceof CameraError ? err.message : 'Não foi possível abrir a câmera agora.';
+    if (isDev) {
+      const codigo = err instanceof CameraError ? err.code : err && err.name;
+      message += ` (${codigo || 'erro desconhecido'})`;
+    }
     mostrarErroCamera(message);
+  } finally {
+    cameraEntrando = false;
   }
+}
+
+function limparVideoCamera() {
+  video.pause();
+  video.srcObject = null;
+  video.removeAttribute('src');
+  video.load();
 }
 
 function saindoDaCamera() {
@@ -193,9 +229,15 @@ function saindoDaCamera() {
   // da tela antes do navegador liberar a permissão) e libera a stream atual.
   cameraRequestId += 1;
   stopCamera();
+  limparVideoCamera();
 }
 
 function mostrarErroCamera(mensagem) {
+  // Garante que nenhum frame "congelado" de uma tentativa anterior continue
+  // visível atrás do painel de erro (o elemento <video> às vezes mantém o
+  // último frame desenhado mesmo depois de srcObject = null).
+  stopCamera();
+  limparVideoCamera();
   cameraErroMensagem.textContent = mensagem;
   cameraErroPainel.hidden = false;
 }

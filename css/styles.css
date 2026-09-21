@@ -796,6 +796,16 @@ p {
   backdrop-filter: blur(6px);
 }
 
+/* Sem isto, o atributo `hidden` do HTML não tem efeito nenhum: a regra
+   `.camera-erro { display: flex }` acima empata em especificidade com o
+   `[hidden] { display: none }` do stylesheet do navegador, e a origem
+   autoral vence — deixando o painel sempre visível, mesmo com hidden=true.
+   (Era exatamente isto que fazia o aviso "Tentar novamente" nunca sumir,
+   mesmo com a câmera funcionando.) */
+.camera-erro[hidden] {
+  display: none;
+}
+
 .camera-erro-conteudo {
   display: flex;
   width: min(520px, 100%);
